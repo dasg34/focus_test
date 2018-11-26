@@ -1,6 +1,6 @@
-// ELM_TC=1 ELM_TEST_FOCUS=5 ./test_scroller
-// ELM_TC=1 NO_MAINLOOP=1 pref stat ./test_scroller
-// gcc -o test_scroller test_scroller.c `pkg-config --cflags --libs elementary ecore-input-evas`
+// ELM_TC=1 ELM_TEST_FOCUS=5 ./test_focus
+// ELM_TC=1 NO_MAINLOOP=1 pref stat ./test_focus
+// gcc -o test_focus test_focus.c `pkg-config --cflags --libs elementary ecore-input-evas`
 
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
@@ -25,6 +25,8 @@ typedef struct
    int total_count;
    unsigned long long total, min, max, first;
 } Focus;
+
+Evas_Object *_tbtn1, *_tbtn2, *_tbtnscr;
 
 static Eina_Bool
 _focus_test_cb(void *data)
@@ -94,6 +96,14 @@ _focus_state_change_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
    Focus *focus = data;
 
    focus->state++;
+}
+
+static void
+_test1_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_object_focus_set(_tbtnscr, EINA_TRUE);
+   elm_object_focus_set(_tbtn2, EINA_TRUE);
+   elm_object_focus_set(_tbtn1, EINA_TRUE);
 }
 
 void
@@ -168,6 +178,15 @@ focus_test1()
      }
    /* } */
 
+   bt = elm_button_add(win);
+   elm_object_text_set(bt, "Test button1");
+   evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, 0.5);
+   evas_object_smart_callback_add(bt, "clicked", _test1_cb, NULL);
+   elm_box_pack_end(bx, bt);
+   evas_object_show(bt);
+   _tbtn1 = bt;
+
    /* { */
    tb = elm_table_add(win);
    evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -195,12 +214,21 @@ focus_test1()
              elm_object_text_set(bt, "Both");
              elm_table_pack(tb2, bt, i, j, 1, 1);
              evas_object_show(bt);
+             if (i == 10 && j == 10) _tbtnscr = bt;
           }
      }
 
    elm_object_content_set(sc, tb2);
    evas_object_show(tb2);
    /* } */
+
+   bt = elm_button_add(win);
+   elm_object_text_set(bt, "Test button2");
+   evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(bx, bt);
+   evas_object_show(bt);
+   _tbtn2 = bt;
 
    for (i = 0; i < 24; i++)
      {
